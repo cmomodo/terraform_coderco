@@ -1,0 +1,11 @@
+#cloud-config
+runcmd:
+  - sudo apt update
+  - sudo apt install -y apache2 mysql-client php libapache2-mod-php php-mysql
+  - sudo systemctl enable --now apache2
+  - wget https://wordpress.org/latest.tar.gz
+  - tar -zxvf latest.tar.gz
+  - sudo mv wordpress /var/www/html/wordpress
+  - sudo chown -R www-data:www-data /var/www/html/wordpress
+  - sudo chmod -R 755 /var/www/html/wordpress
+  - sudo systemctl restart apache2
