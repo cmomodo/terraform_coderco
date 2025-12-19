@@ -1,11 +1,46 @@
 #cloud-config
 runcmd:
-  - sudo apt update
-  - sudo apt install -y apache2 mysql-client php libapache2-mod-php php-mysql
-  - sudo systemctl enable --now apache2
+  # Update system packages
+  - sudo yum update -y
+
+  # Install Apache, MariaDB, PHP and required extensions for Amazon Linux 2023
+  - sudo yum install -y httpd mariadb1011-server php8.3 php8.3-mysqlnd php8.3-gd php8.3-mbstring php8.3-xml php8.3-soap php8.3-intl php8.3-zip php8.3-modphp
+
+  # Start and enable Apache and MariaDB
+  - sudo systemctl enable --now httpd
+  - sudo systemctl enable --now mariadb
+
+  # Secure MariaDB installation (set root password)
+  - sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'RootPassword123!';"
+  - sudo mysql -e "DELETE FROM mysql.user WHERE User='';"
+  - sudo mysql -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  - sudo mysql -e "DROP DATABASE IF EXISTS test;"
+  - sudo mysql -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+  - sudo mysql -e "FLUSH PRIVILEGES;"
+
+  # Configure MySQL - create database and user for WordPress
+  - sudo mysql -u root -pRootPassword123! -e "CREATE DATABASE wordpress_db;"
+  - sudo mysql -u root -pRootPassword123! -e "CREATE USER 'wp_user'@'localhost' IDENTIFIED BY 'StrongPassword123!';"
+  - sudo mysql -u root -pRootPassword123! -e "GRANT ALL PRIVILEGES ON wordpress_db.* TO 'wp_user'@'localhost';"
+  - sudo mysql -u root -pRootPassword123! -e "FLUSH PRIVILEGES;"
+
+  # Download and extract WordPress
+  - cd /tmp
   - wget https://wordpress.org/latest.tar.gz
   - tar -zxvf latest.tar.gz
   - sudo mv wordpress /var/www/html/wordpress
-  - sudo chown -R www-data:www-data /var/www/html/wordpress
+
+  # Create wp-config.php from sample
+  - sudo cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+
+  # Configure WordPress database settings
+  - sudo sed -i "s/database_name_here/wordpress_db/" /var/www/html/wordpress/wp-config.php
+  - sudo sed -i "s/username_here/wp_user/" /var/www/html/wordpress/wp-config.php
+  - sudo sed -i "s/password_here/StrongPassword123!/" /var/www/html/wordpress/wp-config.php
+
+  # Set proper permissions (Amazon Linux uses apache user)
+  - sudo chown -R apache:apache /var/www/html/wordpress
   - sudo chmod -R 755 /var/www/html/wordpress
-  - sudo systemctl restart apache2
+
+  # Restart Apache to apply changes
+  - sudo systemctl restart httpd

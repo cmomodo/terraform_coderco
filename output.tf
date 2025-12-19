@@ -1,3 +1,3 @@
-output "coderco_vpc" {
-  value = aws_instance.coderco_vpc.public_ip
+output "coderco_ec2" {
+  value = aws_instance.coderco_ec2.public_ip
 }
