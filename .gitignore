@@ -2,3 +2,10 @@
 # .tfstate files
 *.tfstate
 *.tfstate.*
+
+#ignore pem file
+*.pem
+
+#ignore tfvars file
+*.tfvars
+*.tfvars.enc
