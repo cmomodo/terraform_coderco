@@ -1,15 +1,20 @@
 # Create a VPC
 resource "aws_vpc" "coderco_vpc" {
   cidr_block = var.vpc_cidr_block
+
+  tags = {
+    Name = "${var.project_name}-vpc"
+  }
 }
 
 #the main subnet.
 resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.coderco_vpc.id
-  cidr_block = var.subnet_cidr_block
+  vpc_id            = aws_vpc.coderco_vpc.id
+  cidr_block        = var.subnet_cidr_block
+  availability_zone = var.availability_zone
 
   tags = {
-    Name = "Main"
+    Name = "${var.project_name}-subnet"
   }
 }
 #attaching vpc to internet gateway
@@ -17,7 +22,7 @@ resource "aws_internet_gateway" "coderco_igw" {
   vpc_id = aws_vpc.coderco_vpc.id
 
   tags = {
-    Name = "CoderCo_IGW"
+    Name = "${var.project_name}-igw"
   }
 }
 
@@ -33,7 +38,7 @@ resource "aws_route_table" "coderco_route" {
 
 
   tags = {
-    Name = "coderco-public"
+    Name = "${var.project_name}-public-rt"
   }
 }
 

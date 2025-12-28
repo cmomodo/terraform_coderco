@@ -1,11 +1,42 @@
+# Local .terraform directories
 **/.terraform/*
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
 
-#ignore pem file
+# Crash log files
+crash.log
+crash.*.log
+
+# .tmp files
+*.tmp
+
+# Exclude all .tfvars files containing secrets
+# (Uncomment the following line if you want to exclude all tfvars)
+# *.tfvars
+
+# Ensure terraform.tfvars.example is not deleted
+!terraform.tfvars.example
+
+# PEM Files
 *.pem
 
-#ignore tfvars file
-*.tfvars
-*.tfvars.enc
+# Terraform plan files
+*.tfplan
+tfplan
+
+# macOS
+.DS_Store
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+#ignore the terraform.tfvars file
+terraform.tfvars
