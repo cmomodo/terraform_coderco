@@ -77,14 +77,8 @@ The project is organized in a modular way using Terraform modules:
 - SSH key name is configurable through variables
 - AMI ID is set for Amazon Linux 2023
 
-## Security Considerations
-
-- Ensure AWS credentials are properly secured and not committed to version control
-- Review security group rules before applying to production environments
-- Consider enabling VPC flow logs for network monitoring
-- Review and restrict IAM permissions as needed
-- Update default passwords in cloud_init.yaml for production use
-- Limit SSH access CIDR to trusted networks only
+#Screenshot Of Application Working!
+![Application Screenshot](Images/application.png)
 
 ## License
 
