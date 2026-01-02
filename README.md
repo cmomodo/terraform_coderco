@@ -1,26 +1,10 @@
 # CoderCo Terraform Infrastructure
 
-This Terraform project provisions AWS infrastructure including a VPC, subnet, internet gateway, EC2 instance, and security group.
+This is a project where we deploy a WordPress website on AWS using Terraform. we will use an EC2 instance and set up a VPC for proper network isolation. we will start with getting everything from the terraform docs , then we will make it better by using modules and variables. The secret arguments will be stored in a terraform.tfvars file.
 
-## Infrastructure Components
+## System Design
 
-### VPC Configuration
-- **VPC**: Custom VPC with CIDR block `10.0.0.0/16`
-- **Subnet**: Main subnet with CIDR block `10.0.2.0/24`
-- **Internet Gateway**: Provides internet connectivity for the VPC
-
-### EC2 Instance
-- **Instance Type**: t3.micro
-- **AMI**: ami-068c0051b15cdb816
-- **User Data**: Cloud-init configuration from `user_data/cloud_init.yaml`
-- **Name**: coderco-instance
-
-### Security Group
-- **Name**: allow_tls
-- **Ingress Rule**: Allows TLS traffic (port 443) from within the VPC CIDR block
-
-### Outputs
-- **coderco_vpc**: Public IP address of the EC2 instance
+![System Design Diagram](./Images/wordpress.png)
 
 ## Prerequisites
 
@@ -61,38 +45,40 @@ terraform destroy
 ## Project Structure
 
 ```
-.
-├── aws.tf          # AWS provider configuration
-├── vpc.tf          # VPC, subnet, and internet gateway resources
-├── ec2.tf          # EC2 instance and security group resources
-├── output.tf       # Output definitions
-├── main.tf         # Main configuration file
-└── user_data/      # Directory containing cloud-init configuration
-    └── cloud_init.yaml
+
+├── Images/             # Project images and diagrams
+├── modules/            # Terraform modules
+│   ├── network/        # Network resources (VPC, subnets, security groups)
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── compute/        # Compute resources (EC2 instances)
+│       ├── main.tf
+│       ├── variables.tf
+│       └── outputs.tf
+├── user_data/          # Cloud-init configuration files
+│   └── cloud_init.yaml # WordPress installation script
+└── .DS_Store           # Git ignored: macOS file metadata
 ```
 
 ## Configuration Details
 
-### Files
+The project is organized in a modular way using Terraform modules:
 
-- **aws.tf**: Defines the AWS provider and required version
-- **vpc.tf**: Creates VPC, subnet, and internet gateway
-- **ec2.tf**: Provisions EC2 instance and configures security group with ingress rules
-- **output.tf**: Exports the public IP of the EC2 instance
-- **main.tf**: Currently empty, can be used for additional resources
+- **network module**: Handles VPC, subnet, internet gateway, and security groups
+- **compute module**: Handles EC2 instance creation and configuration
+- **Main configuration**: Root files that tie modules together with variables
 
 ## Notes
 
-- The security group currently allows TLS traffic (port 443) only from within the VPC
-- The EC2 instance uses a cloud-init configuration file for initial setup
-- SSH key is commented out in the EC2 configuration
+- The security group currently allows SSH access from the configured CIDR block
+- The EC2 instance uses a cloud-init configuration file for initial WordPress setup
+- The project follows Infrastructure as Code (IaC) best practices with modular design
+- SSH key name is configurable through variables
+- AMI ID is set for Amazon Linux 2023
 
-## Security Considerations
-
-- Ensure AWS credentials are properly secured and not committed to version control
-- Review security group rules before applying to production environments
-- Consider enabling VPC flow logs for network monitoring
-- Review and restrict IAM permissions as needed
+#Screenshot Of Application Working!
+![Application Screenshot](Images/application.png)
 
 ## License
 

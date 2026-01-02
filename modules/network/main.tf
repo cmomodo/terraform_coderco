@@ -1,26 +1,32 @@
 # Create a VPC
 resource "aws_vpc" "coderco_vpc" {
-  cidr_block = "10.0.0.0/16"
-}
-
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.coderco_vpc.id
-  cidr_block = "10.0.3.0/24"
+  cidr_block = var.vpc_cidr_block
 
   tags = {
-    Name = "Main"
+    Name = "${var.project_name}-vpc"
   }
 }
 
+#the main subnet.
+resource "aws_subnet" "main" {
+  vpc_id            = aws_vpc.coderco_vpc.id
+  cidr_block        = var.subnet_cidr_block
+  availability_zone = var.availability_zone
+
+  tags = {
+    Name = "${var.project_name}-subnet"
+  }
+}
+#attaching vpc to internet gateway
 resource "aws_internet_gateway" "coderco_igw" {
   vpc_id = aws_vpc.coderco_vpc.id
 
   tags = {
-    Name = "CoderCo IGW"
+    Name = "${var.project_name}-igw"
   }
 }
 
-
+#route table for internet gateway
 resource "aws_route_table" "coderco_route" {
   vpc_id = aws_vpc.coderco_vpc.id
 
@@ -32,7 +38,7 @@ resource "aws_route_table" "coderco_route" {
 
 
   tags = {
-    Name = "coderco-public"
+    Name = "${var.project_name}-public-rt"
   }
 }
 
@@ -59,23 +65,23 @@ resource "aws_security_group" "ec2" {
   vpc_id      = aws_vpc.coderco_vpc.id
 
   tags = {
-    Name = "coder_co_web_traffic"
+    Name = "${var.project_name}_ec2_traffic"
   }
-
+  #port 80 for http
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  #port 22 for ssh
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.allow_ssh_cidr]
   }
-
+  #outbound rules
   egress {
     from_port   = 0
     to_port     = 0
